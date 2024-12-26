@@ -1,0 +1,42 @@
+{
+  "name": "etsyapp",
+  "version": "0.0.1",
+  "description": "A simple Node app that makes requests to Etsy’s Open API.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "midnight-task": "ts-node src/__tests__/scripts/runMidnightTask.ts"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "express": "4.x",
+    "hbs": "^4.2.0",
+    "mongodb": "^6.8.1",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.6.1",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^6.9.15"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/jest": "^29.5.14",
+    "@types/multer": "^1.4.12",
+    "@types/node-fetch": "^2.6.12",
+    "@types/node-schedule": "^2.1.7",
+    "@types/nodemailer": "^6.4.17",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

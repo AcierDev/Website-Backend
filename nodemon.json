@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "views"],
+  "ext": "ts,hbs",
+  "ignore": ["src/**/*.test.ts"],
+  "exec": "ts-node --transpile-only ./src/server.ts"
+}
