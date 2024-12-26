@@ -25,6 +25,7 @@ export class AlertManager {
   private static readonly recipientMap = {
     Ben: ["9172005099"],
     "Ben & Akiva": ["9172005099", "9293277420"],
+    "Ben & Akiva & Dovi": ["9172005099", "9293277420", "2038195430"],
     "Ben & Akiva & Alex": ["9172005099", "9293277420", "7755137691"],
     Everyone: ["9172005099", "9293277420", "7755137691", "7023244384"],
   };
