@@ -12,6 +12,9 @@
     "midnight-task": "ts-node src/__tests__/scripts/runMidnightTask.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-textract": "^3.726.0",
+    "@aws-sdk/credential-provider-node": "^3.726.0",
+    "@google/generative-ai": "^0.21.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

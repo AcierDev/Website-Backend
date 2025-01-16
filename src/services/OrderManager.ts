@@ -119,6 +119,9 @@ export class OrderManager {
     for (const item of order.items) {
       if (item.name === "Discount") continue;
 
+      const dueDate = new Date(order.shipByDate);
+      const formattedDueDate = dueDate.toISOString().split("T")[0];
+
       const newItem: Item = {
         id: order.orderId.toString(),
         values: [
@@ -129,7 +132,7 @@ export class OrderManager {
           },
           {
             columnName: ColumnTitles.Due,
-            text: new Date(order.shipByDate).getTime().toString(),
+            text: formattedDueDate,
             type: ColumnTypes.Date,
           },
           {
@@ -142,6 +145,41 @@ export class OrderManager {
             type: ColumnTypes.Dropdown,
             text:
               this.parseDimensions(item.options[0]?.value) || "Unknown Size",
+          },
+          {
+            columnName: ColumnTitles.Painted,
+            type: ColumnTypes.Dropdown,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Backboard,
+            type: ColumnTypes.Dropdown,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Glued,
+            type: ColumnTypes.Dropdown,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Packaging,
+            type: ColumnTypes.Dropdown,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Boxes,
+            type: ColumnTypes.Dropdown,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Notes,
+            type: ColumnTypes.Text,
+            text: "",
+          },
+          {
+            columnName: ColumnTitles.Rating,
+            type: ColumnTypes.Text,
+            text: "",
           },
         ],
         createdAt: new Date(order.createDate).getTime(),

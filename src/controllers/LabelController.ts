@@ -3,9 +3,11 @@ import { promises as fs } from "fs";
 import path from "path";
 import { uploadDir } from "../config/uploadConfig";
 import { LoggerService } from "../services/LoggerService";
+import { TextractService } from "../services/TextractService";
 
 export class LabelController {
   private logger = LoggerService.getInstance();
+  private textractService = TextractService.getInstance();
 
   public uploadLabel = async (req: Request, res: Response): Promise<void> => {
     if (!req.file) {
@@ -29,12 +31,19 @@ export class LabelController {
       const newPath = path.join(uploadDir, customFilename);
 
       await fs.rename(oldPath, newPath);
-      res
-        .status(200)
-        .send(`File uploaded successfully. Saved as: ${customFilename}`);
+
+      // Extract tracking number
+      const trackingNumber = await this.textractService.extractTrackingNumber(
+        newPath
+      );
+
+      res.status(200).json({
+        message: `File uploaded successfully. Saved as: ${customFilename}`,
+        trackingNumber: trackingNumber,
+      });
     } catch (error) {
-      this.logger.error("Error saving file:", error as Error);
-      res.status(500).send("Error saving file with custom filename.");
+      this.logger.error("Error processing label:", error as Error);
+      res.status(500).send("Error processing label file.");
     }
   };
 
@@ -105,7 +114,9 @@ export class LabelController {
     try {
       const files = await fs.readdir(uploadDir);
       const pdfFiles = files.filter(
-        (file) => path.extname(file).toLowerCase() === ".pdf"
+        (file) =>
+          path.extname(file).toLowerCase() === ".pdf" &&
+          !file.startsWith("deleted_")
       );
       res.json(pdfFiles);
     } catch (error) {
