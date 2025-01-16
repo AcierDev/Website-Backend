@@ -1,82 +1,77 @@
-import nodemailer from "nodemailer";
-import { config } from "../config/config";
-import { LoggerService } from "./LoggerService";
+import { SendMailClient } from "zeptomail";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export class AlertManager {
-  private static logger = LoggerService.getInstance();
-
-  private static transporter = nodemailer.createTransport({
-    host: config.email.host,
-    port: config.email.port,
-    secure: true,
-    auth: {
-      user: config.email.user,
-      pass: config.email.password,
-    },
+  private static client = new SendMailClient({
+    url: "api.zeptomail.com/",
+    token: process.env.ZEPTO_TOKEN || "",
   });
 
-  private static readonly carriers = {
+  private static carriers = {
     verizon: "vtext.com",
     att: "txt.att.net",
     tmobile: "tmomail.net",
     sprint: "messaging.sprintpcs.com",
-  } as const;
-
-  private static readonly recipientMap = {
-    Ben: ["9172005099"],
-    "Ben & Akiva": ["9172005099", "9293277420"],
-    "Ben & Akiva & Dovi": ["9172005099", "9293277420", "2038195430"],
-    "Ben & Akiva & Alex": ["9172005099", "9293277420", "7755137691"],
-    Everyone: ["9172005099", "9293277420", "7755137691", "7023244384"],
   };
 
   static async sendText(
-    to: keyof typeof AlertManager.recipientMap,
+    to: "Ben" | "Ben & Akiva" | "Ben & Akiva & Alex" | "Everyone",
     type: "New Message" | "Error",
     message: string
   ): Promise<void> {
     const recipients = this.getRecipients(to);
     const RECIPIENT_CARRIER = "tmobile";
 
-    this.logger.info("Sending text to:", recipients);
+    console.log("Sending text to:", recipients);
 
-    try {
-      await Promise.all(
-        recipients.map((recipient) =>
-          this.sendSingleText(recipient, type, message, RECIPIENT_CARRIER)
-        )
-      );
-    } catch (error) {
-      this.logger.error("Failed to send texts:", error as Error);
-      throw error;
-    }
-  }
+    const sendPromises = recipients.map(async (recipient) => {
+      const mailOptions = {
+        from: {
+          address: process.env.EMAIL_USER || "",
+          name: "Everwood Alert",
+        },
+        to: [
+          {
+            email_address: {
+              address: `${recipient}@${this.carriers[RECIPIENT_CARRIER]}`,
+              name: recipient,
+            },
+          },
+        ],
+        subject: "⠀",
+        textbody: message,
+      };
 
-  private static async sendSingleText(
-    recipient: string,
-    type: string,
-    message: string,
-    carrier: keyof typeof AlertManager.carriers
-  ): Promise<void> {
-    const mailOptions = {
-      from: config.email.user,
-      to: `${recipient}@${this.carriers[carrier]}`,
-      subject: "Everwood Backend Server " + type,
-      text: message,
-    };
+      try {
+        await this.client.sendMail(mailOptions);
+        console.log(`Text message sent to ${recipient}: ${message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(
+            `Failed to send text to ${recipient}: ${error.message}`
+          );
+        } else {
+          console.error(`Failed to send text to ${recipient}: Unknown error`);
+        }
+        throw error;
+      }
+    });
 
-    try {
-      await this.transporter.sendMail(mailOptions);
-      this.logger.info(`Text message sent to ${recipient}: ${message}`);
-    } catch (error) {
-      this.logger.error(`Failed to send text to ${recipient}:`, error as Error);
-      throw error;
-    }
+    await Promise.all(sendPromises);
   }
 
   private static getRecipients(
-    to: keyof typeof AlertManager.recipientMap
+    to: "Ben" | "Ben & Akiva" | "Ben & Akiva & Alex" | "Everyone"
   ): string[] {
-    return this.recipientMap[to] || [];
+    const recipientMap = {
+      Ben: ["9172005099"],
+      "Ben & Akiva": ["9172005099", "9293277420"],
+      "Ben & Akiva & Alex": ["9172005099", "9293277420", "7755137691"],
+      Everyone: ["9172005099", "9293277420", "7755137691", "7023244384"],
+    };
+
+    return recipientMap[to] || [];
   }
 }
