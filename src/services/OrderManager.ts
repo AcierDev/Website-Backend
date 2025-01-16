@@ -57,11 +57,27 @@ export class OrderManager {
       }
       await this.db.addItemToBoard(board.id, item);
       this.logger.info("New item added successfully");
-      await AlertManager.sendText(
-        "Ben",
-        "New Message",
-        `New order for ${item.shippingDetails.name} imported to the system successfully`
-      );
+      
+      // Count hidden items
+      const hiddenItems = board.items_page.items.filter(
+        (item) => item.status === ItemStatus.Hidden
+      ).length + 1; // Add 1 to include the newly added item
+      
+      // Send alerts
+      await Promise.all([
+        AlertManager.sendText(
+          "Ben",
+          "New Message",
+          `New order for ${item.shippingDetails.name} imported to the system successfully`
+        ),
+        // Send additional alert if 5 or more hidden items
+        hiddenItems >= 5 ? 
+          AlertManager.sendText(
+            "Ben & Akiva & Dovi",
+            "New Message",
+            `Alert: There are now ${hiddenItems} hidden orders in the system that need attention`
+          ) : Promise.resolve()
+      ]);
     } catch (error) {
       await this.handleError(
         `Error adding new item for ${item.shippingDetails.name}`,

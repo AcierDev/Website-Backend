@@ -79,4 +79,17 @@ export class DatabaseService extends EventEmitter {
       { $push: { "items_page.items": item } }
     );
   }
+
+  public async close(): Promise<void> {
+    try {
+      if (this.mongoClient) {
+        await this.mongoClient.close();
+        this.mongoClient = null;
+        this.db = null;
+        this.boards = null;
+      }
+    } catch (error) {
+      throw new Error(`Failed to close database connection: ${error}`);
+    }
+  }
 }

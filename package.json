@@ -9,7 +9,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "midnight-task": "ts-node src/__tests__/scripts/runMidnightTask.ts"
+    "midnight-task": "ts-node src/__tests__/scripts/runMidnightTask.ts",
+    "test:alerts": "ts-node src/__tests__/scripts/testHiddenItemsAlert.ts"
   },
   "dependencies": {
     "@aws-sdk/client-textract": "^3.726.0",
